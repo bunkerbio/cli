@@ -163,8 +163,8 @@ describe("ModelResolver", () => {
   });
 
   describe("parseModelSpec", () => {
-    it("should throw error for spec without colon", () => {
-      expect(() => resolver.resolve("invalid-spec")).rejects.toThrow(
+    it("should throw error for spec without colon", async () => {
+      await expect(resolver.resolve("invalid-spec")).rejects.toThrow(
         ModelNotFoundError
       );
     });

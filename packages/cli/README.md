@@ -105,9 +105,14 @@ Standard help and version output. Every subcommand also supports `--help`
 
 ## Model specifiers
 
-Models are referenced as `<huggingface-repo>:<gguf-filename>`, e.g.
-`mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M.gguf`, or as a local file path to a `.gguf`
-file already on disk.
+Models are referenced as `<huggingface-repo>:<pattern>`, where `<pattern>` can be either:
+
+- An exact GGUF filename (e.g. `mistral-7b-instruct-v0.2.Q4_K_M.gguf`)
+- A quant pattern like `Q4_K_M` — Boole will find the matching GGUF file automatically
+
+If the pattern matches multiple files, Boole lists them so you can pick the exact one. If no files match, it shows all available GGUF files in the repo.
+
+You can also pass a local file path to a `.gguf` file already on disk.
 
 ## Platform support
 
