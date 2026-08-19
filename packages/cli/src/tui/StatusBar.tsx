@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Text } from "ink";
 import Spinner from "ink-spinner";
 import type { Mode } from "./session.js";
+import { theme } from "./theme.js";
 
 interface StatusBarProps {
   model: string | null;
@@ -13,7 +14,7 @@ export function StatusBar({ model, mode, isGenerating }: StatusBarProps) {
   return (
     <Box borderStyle="single" borderColor="gray" padding={0} paddingX={1}>
       <Text>
-        <Text bold color="cyan">
+        <Text bold color={theme.accent}>
           Model:{" "}
         </Text>
         <Text>{model || "none"}</Text>
@@ -25,7 +26,7 @@ export function StatusBar({ model, mode, isGenerating }: StatusBarProps) {
         {isGenerating && (
           <>
             <Text dimColor> | </Text>
-            <Text color="magenta">
+            <Text color={theme.accent}>
               <Spinner type="dots" />
               {" Generating..."}
             </Text>

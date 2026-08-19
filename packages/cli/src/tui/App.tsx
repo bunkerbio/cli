@@ -15,6 +15,7 @@ import type { PendingConfirmation } from "./AgentTools/types.js";
 import { readFile } from "./AgentTools/readFile.js";
 import { writeFile } from "./AgentTools/writeFile.js";
 import { runShell } from "./AgentTools/runShell.js";
+import { theme } from "./theme.js";
 
 interface AppProps {
   initialModel?: string;
@@ -134,11 +135,11 @@ export function App({ initialModel }: AppProps) {
       <Box
         flexDirection="column"
         borderStyle="double"
-        borderColor="cyan"
+        borderColor={theme.border}
         padding={1}
         marginBottom={1}
       >
-        <Text bold color="cyan">
+        <Text bold color={theme.accent}>
           Boole Interactive Mode
         </Text>
         <Text dimColor>

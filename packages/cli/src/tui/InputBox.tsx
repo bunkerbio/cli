@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Text } from "ink";
 import TextInput from "ink-text-input";
+import { theme } from "./theme.js";
 
 interface InputBoxProps {
   value: string;
@@ -16,8 +17,8 @@ export function InputBox({
   disabled = false,
 }: InputBoxProps) {
   return (
-    <Box borderStyle="single" borderColor="blue" padding={0} paddingX={1}>
-      <Text bold color="blue">
+    <Box borderStyle="single" borderColor={theme.border} padding={0} paddingX={1}>
+      <Text bold color={theme.accent}>
         &gt;{" "}
       </Text>
       {disabled ? (
