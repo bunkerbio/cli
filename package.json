@@ -1,6 +1,6 @@
 {
-  "name": "@boole/boole",
-  "version": "0.2.0",
+  "name": "@boole/boole-cli",
+  "version": "0.3.0",
   "description": "Local-first LLM inference SDK for JavaScript & TypeScript. Run GGUF models on your own hardware via llama.cpp, with an App/Function/Sandbox API and a 10x cost cut over always-remote inference.",
   "license": "BSD-2-Clause",
   "type": "module",
