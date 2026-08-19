@@ -1,0 +1,63 @@
+{
+  "name": "@boole/cli",
+  "version": "0.3.0",
+  "description": "CLI for local-first LLM inference. Run GGUF models from your terminal with zero network latency, no cold starts, no cloud dependency.",
+  "license": "BSD-2-Clause",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "boole": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "commander": "^14.0.3",
+    "node-llama-cpp": "^3.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^20.17.6",
+    "@typescript-eslint/eslint-plugin": "^8.13.0",
+    "@typescript-eslint/parser": "^8.13.0",
+    "eslint": "^9.15.0",
+    "prettier": "^3.3.3",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  },
+  "keywords": [
+    "cli",
+    "llm",
+    "inference",
+    "local-first",
+    "on-device",
+    "edge-ai",
+    "llama.cpp",
+    "gguf",
+    "local-llm",
+    "command-line",
+    "terminal",
+    "ai",
+    "machine-learning"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boole-ai/boole-npm.git",
+    "directory": "packages/cli"
+  }
+}
