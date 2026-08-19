@@ -1,5 +1,5 @@
 {
-  "name": "@boole/boole",
+  "name": "@boole/cli",
   "version": "0.3.0",
   "description": "Run AI models at the edge — SDK and CLI for local-first LLM inference. Zero network latency, no cold starts, no cloud dependency. Powered by llama.cpp and GGUF.",
   "license": "BSD-2-Clause",
