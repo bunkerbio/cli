@@ -1,4 +1,4 @@
-import { ModelResolver } from "../models/resolver.js";
+import { ModelResolver } from "./models/resolver.js";
 import { stat } from "fs/promises";
 
 export async function pullCommand(modelSpec: string): Promise<void> {

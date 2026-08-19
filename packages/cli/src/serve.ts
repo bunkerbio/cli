@@ -1,14 +1,14 @@
 import { createServer, IncomingMessage, ServerResponse } from "http";
-import { App } from "../app.js";
-import { Client } from "../client.js";
+import { LlamaCppEngine } from "./engine/llama-cpp.js";
+import { ModelResolver } from "./models/resolver.js";
 
 export interface ServeOptions {
   port: number;
 }
 
 export async function serveCommand(options: ServeOptions): Promise<void> {
-  const client = new Client();
-  const app = new App({ name: "boole-server", client });
+  const resolver = new ModelResolver();
+  const engineCache = new Map<string, LlamaCppEngine>();
 
   const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
     // CORS headers for local development
@@ -39,18 +39,22 @@ export async function serveCommand(options: ServeOptions): Promise<void> {
             return;
           }
 
-          const fn = app.function({ model }, async (ctx, _input) => {
-            return await ctx.llm.generate(prompt, {
-              maxTokens,
-              temperature,
-              topP,
-            });
+          let engine = engineCache.get(model);
+          if (!engine || !engine.isLoaded()) {
+            engine = new LlamaCppEngine();
+            const modelPath = await resolver.resolve(model);
+            await engine.loadModel(modelPath);
+            engineCache.set(model, engine);
+          }
+
+          const result = await engine.generate(prompt, {
+            maxTokens,
+            temperature,
+            topP,
           });
 
-          const result = await fn.call(null);
-
           res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ text: result }));
+          res.end(JSON.stringify({ text: result.text }));
         } catch (error) {
           res.writeHead(500, { "Content-Type": "application/json" });
           res.end(
