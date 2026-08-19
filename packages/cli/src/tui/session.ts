@@ -11,6 +11,7 @@ export interface SessionState {
   messages: Message[];
   currentModel: string | null;
   isGenerating: boolean;
+  tokensPerSecond: number | null;
 }
 
 export function createSession(): SessionState {
@@ -19,6 +20,7 @@ export function createSession(): SessionState {
     messages: [],
     currentModel: null,
     isGenerating: false,
+    tokensPerSecond: null,
   };
 }
 
@@ -55,4 +57,11 @@ export function setGenerating(
 
 export function clearMessages(session: SessionState): SessionState {
   return { ...session, messages: [] };
+}
+
+export function setTokensPerSecond(
+  session: SessionState,
+  tokensPerSecond: number | null
+): SessionState {
+  return { ...session, tokensPerSecond };
 }

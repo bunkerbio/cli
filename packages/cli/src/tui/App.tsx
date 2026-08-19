@@ -8,6 +8,7 @@ import {
   createSession,
   addMessage,
   setGenerating,
+  setTokensPerSecond,
   type SessionState,
 } from "./session.js";
 import { handleSlashCommand } from "./slashCommands.js";
@@ -98,19 +99,35 @@ export function App({ initialModel }: AppProps) {
     // In real implementation, this would call LlamaCppEngine.generateStream()
     const mockResponse = `This is a mock response to: "${value}"\n\nIn a real implementation, this would call the LlamaCppEngine to generate a response.`;
 
-    // Simulate streaming
+    // Track token generation for tok/s calculation
+    const startTime = Date.now();
+    let tokenCount = 0;
+
+    // Simulate streaming with tok/s tracking
     for (let i = 0; i < mockResponse.length; i++) {
       await new Promise((resolve) => setTimeout(resolve, 10));
       setStreamingContent(mockResponse.substring(0, i + 1));
+
+      tokenCount++;
+      const elapsed = (Date.now() - startTime) / 1000;
+
+      // Only update tok/s if enough time has passed to avoid huge numbers
+      if (elapsed > 0.1) {
+        const tokensPerSecond = tokenCount / elapsed;
+        setSession((prev) => setTokensPerSecond(prev, tokensPerSecond));
+      }
     }
 
-    // Add complete message
-    const finalSession = addMessage(
-      setGenerating(newSession, false),
-      {
-        role: "assistant",
-        content: mockResponse,
-      }
+    // Add complete message and clear tok/s
+    const finalSession = setTokensPerSecond(
+      addMessage(
+        setGenerating(newSession, false),
+        {
+          role: "assistant",
+          content: mockResponse,
+        }
+      ),
+      null
     );
     setSession(finalSession);
     setStreamingContent("");
@@ -184,6 +201,7 @@ export function App({ initialModel }: AppProps) {
         model={session.currentModel}
         mode={session.mode}
         isGenerating={session.isGenerating}
+        tokensPerSecond={session.tokensPerSecond}
       />
     </Box>
   );

@@ -8,9 +8,10 @@ interface StatusBarProps {
   model: string | null;
   mode: Mode;
   isGenerating: boolean;
+  tokensPerSecond: number | null;
 }
 
-export function StatusBar({ model, mode, isGenerating }: StatusBarProps) {
+export function StatusBar({ model, mode, isGenerating, tokensPerSecond }: StatusBarProps) {
   return (
     <Box borderStyle="single" borderColor="gray" padding={0} paddingX={1}>
       <Text>
@@ -29,6 +30,9 @@ export function StatusBar({ model, mode, isGenerating }: StatusBarProps) {
             <Text color={theme.accent}>
               <Spinner type="dots" />
               {" Generating..."}
+              {tokensPerSecond !== null && tokensPerSecond > 0 && (
+                <Text> {tokensPerSecond.toFixed(1)} tok/s</Text>
+              )}
             </Text>
           </>
         )}

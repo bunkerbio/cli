@@ -10,7 +10,17 @@ export default defineConfig({
   outDir: "dist",
   shims: true,
   banner: {
-    js: "#!/usr/bin/env node",
+    js: `#!/usr/bin/env node
+// Check Node version before running
+const [major] = process.versions.node.split(".").map(Number);
+if (isNaN(major) || major < 22) {
+  console.error(
+    "Boole requires Node.js 22 or later. You're running Node " + process.versions.node + ".\\n" +
+    "Please upgrade: https://nodejs.org/en/download\\n" +
+    "If you use nvm: nvm install 22 && nvm use 22"
+  );
+  process.exit(1);
+}`,
   },
   esbuildOptions(options) {
     options.jsx = "transform";
