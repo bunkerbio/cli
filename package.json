@@ -2,15 +2,31 @@
   "name": "boole-monorepo",
   "version": "0.0.0",
   "private": true,
-  "description": "Boole monorepo containing @boole/boole (library) and @boole/cli (CLI)",
-  "scripts": {
-    "build": "pnpm --filter './packages/*' run build",
-    "test": "pnpm --filter './packages/*' run test",
-    "lint": "pnpm --filter './packages/*' run lint"
+  "description": "Boole monorepo: @boole/boole (library) and @boole/cli (CLI tool) for local-first LLM inference",
+  "license": "BSD-2-Clause",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boole-ai/boole-npm.git"
   },
-  "devDependencies": {},
+  "scripts": {
+    "build": "pnpm -r --filter './packages/*' run build",
+    "test": "pnpm -r --filter './packages/*' run test",
+    "lint": "pnpm -r --filter './packages/*' run lint",
+    "clean": "pnpm -r --filter './packages/*' exec rm -rf dist node_modules",
+    "build:boole": "pnpm --filter @boole/boole run build",
+    "build:cli": "pnpm --filter @boole/cli run build",
+    "test:boole": "pnpm --filter @boole/boole run test",
+    "test:cli": "pnpm --filter @boole/cli run test"
+  },
   "engines": {
     "node": ">=20",
     "pnpm": ">=8"
-  }
+  },
+  "keywords": [
+    "monorepo",
+    "llm",
+    "inference",
+    "local-first",
+    "llama.cpp"
+  ]
 }
