@@ -115,6 +115,13 @@ export class ModelResolver {
       const response = await fetch(url, { headers });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new ModelNotFoundError(
+            `Access denied for "${repoId}" (HTTP 401).\n` +
+            `This repository may require authentication. If you have a Hugging Face account with\n` +
+            `access, provide a token via --hf-token <token> or the HF_TOKEN environment variable.`
+          );
+        }
         throw new ModelNotFoundError(
           `Failed to fetch repo info for ${repoId}: HTTP ${response.status}`
         );
@@ -152,6 +159,13 @@ export class ModelResolver {
       const response = await fetch(url, { headers });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new ModelDownloadError(
+            `${repoId}:${filename}`,
+            `Access denied (HTTP 401). This repository may require authentication.\n` +
+            `Provide a token via --hf-token <token> or the HF_TOKEN environment variable.`
+          );
+        }
         throw new ModelDownloadError(
           `${repoId}:${filename}`,
           `HTTP ${response.status}: ${response.statusText}`

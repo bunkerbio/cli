@@ -22,10 +22,15 @@ npm install -g @boole/cli
 
 ---
 
+## Requirements
+
+- Node.js >= 22 (some dependencies require Node 22+)
+- macOS, Linux, or Windows (x64/arm64)
+
 ## Quickstart
 
 ```bash
-npx @boole/cli run mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M --prompt "Write a haiku about GPUs"
+npx @boole/cli run TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M --prompt "Write a haiku about GPUs"
 ```
 
 The first run downloads and caches the GGUF weights to `~/.boole/models`; every run after
@@ -56,7 +61,7 @@ npx @boole/cli run <model> --prompt "<text>" [options]
 | `--top-k <n>` | Top-k sampling cutoff. |
 
 ```bash
-npx @boole/cli run mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M \
+npx @boole/cli run TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M \
   --prompt "Explain recursion in one sentence" \
   --stream \
   --max-tokens 200
@@ -68,7 +73,7 @@ Pre-download a model into the local cache without running inference — useful f
 the cache ahead of offline use, or in CI.
 
 ```bash
-npx @boole/cli pull mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M
+npx @boole/cli pull TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M
 ```
 
 ### `boole serve`
@@ -113,6 +118,25 @@ Models are referenced as `<huggingface-repo>:<pattern>`, where `<pattern>` can b
 If the pattern matches multiple files, Boole lists them so you can pick the exact one. If no files match, it shows all available GGUF files in the repo.
 
 You can also pass a local file path to a `.gguf` file already on disk.
+
+## Authentication
+
+Some Hugging Face repositories are gated and require authentication. If you encounter a 401 error, provide your Hugging Face token:
+
+**Via command-line flag:**
+```bash
+npx @boole/cli run mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M \
+  --hf-token hf_xxxx \
+  --prompt "Hello"
+```
+
+**Via environment variable:**
+```bash
+export HF_TOKEN=hf_xxxx
+npx @boole/cli run mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M --prompt "Hello"
+```
+
+Get your token from [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens).
 
 ## Platform support
 
