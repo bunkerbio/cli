@@ -9,6 +9,7 @@ import {
   addMessage,
   setGenerating,
   setTokensPerSecond,
+  setModel,
   type SessionState,
 } from "./session.js";
 import { handleSlashCommand } from "./slashCommands.js";
@@ -17,6 +18,7 @@ import { readFile } from "./AgentTools/readFile.js";
 import { writeFile } from "./AgentTools/writeFile.js";
 import { runShell } from "./AgentTools/runShell.js";
 import { theme } from "./theme.js";
+import { DEFAULT_MODEL, DEFAULT_MODEL_SIZE_GB } from "../config.js";
 
 interface AppProps {
   initialModel?: string;
@@ -33,6 +35,7 @@ export function App({ initialModel }: AppProps) {
   const [pendingConfirmation, setPendingConfirmation] =
     useState<PendingConfirmation | null>(null);
   const [helpMessage, setHelpMessage] = useState<string | null>(null);
+  const [showFirstRunMessage, setShowFirstRunMessage] = useState(false);
 
   // Handle confirmation keys (y/n) when there's a pending confirmation
   useInput(
@@ -83,8 +86,18 @@ export function App({ initialModel }: AppProps) {
       return;
     }
 
+    // Check if we need to load the default model
+    let updatedSession = session;
+    if (!session.currentModel) {
+      updatedSession = setModel(session, DEFAULT_MODEL);
+      setSession(updatedSession);
+      // Show first-run message for 5 seconds
+      setShowFirstRunMessage(true);
+      setTimeout(() => setShowFirstRunMessage(false), 5000);
+    }
+
     // Add user message
-    const newSession = addMessage(session, {
+    const newSession = addMessage(updatedSession, {
       role: "user",
       content: value,
     });
@@ -177,6 +190,21 @@ export function App({ initialModel }: AppProps) {
           marginBottom={1}
         >
           <Text color="yellow">{helpMessage}</Text>
+        </Box>
+      )}
+
+      {showFirstRunMessage && (
+        <Box
+          borderStyle="round"
+          borderColor="cyan"
+          padding={1}
+          marginBottom={1}
+        >
+          <Text color="cyan">
+            No model specified — using Boole's default model (Boole 20B, Q4_K_M).{"\n"}
+            This is a one-time download (~{DEFAULT_MODEL_SIZE_GB}GB) and will be cached at ~/.boole/models for future use.{"\n"}
+            You can use a different model anytime with: /model &lt;name&gt;
+          </Text>
         </Box>
       )}
 

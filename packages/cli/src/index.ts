@@ -21,15 +21,15 @@ program
   .option("--hf-token <token>", "Hugging Face API token for gated repositories");
 
 program
-  .command("run <model>")
-  .description("Run a one-off generation with a model")
+  .command("run [model]")
+  .description("Run a one-off generation with a model (defaults to Boole 20B)")
   .requiredOption("-p, --prompt <text>", "The prompt to generate from")
   .option("-s, --stream", "Stream tokens as they generate", false)
   .option("--max-tokens <n>", "Maximum tokens to generate", parseInt)
   .option("--temperature <n>", "Sampling temperature", parseFloat)
   .option("--top-p <n>", "Top-p sampling", parseFloat)
   .option("--top-k <n>", "Top-k sampling", parseInt)
-  .action(async (model: string, options, command) => {
+  .action(async (model: string | undefined, options, command) => {
     try {
       const hfToken = command.parent.opts().hfToken || process.env.HF_TOKEN;
       await runCommand(model, { ...options, hfToken });

@@ -13,6 +13,8 @@ GGUF models directly on your own machine.
 npx @boole/cli
 ```
 
+This launches an interactive TUI (text user interface) where you can chat with Boole's default model. No model specification needed — just type your prompt and press enter.
+
 No install needed — this always runs the latest version. If you use Boole often and want
 the shorter `boole` command without the `npx` prefix, install it globally:
 
@@ -29,13 +31,21 @@ npm install -g @boole/cli
 
 ## Quickstart
 
+**Option 1: Use the default model (Boole 20B)**
+
+```bash
+npx @boole/cli run --prompt "Write a haiku about GPUs"
+```
+
+The first run downloads Boole's default model (~TBD GB) to `~/.boole/models`; subsequent runs load from disk instantly.
+
+**Option 2: Use any other GGUF model**
+
 ```bash
 npx @boole/cli run TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M --prompt "Write a haiku about GPUs"
 ```
 
-The first run downloads and caches the GGUF weights to `~/.boole/models`; every run after
-that loads from disk and runs entirely on your machine — no network call, no API key, no
-per-token bill.
+Same behavior — first run downloads, then runs entirely on your machine with no network call, API key, or per-token bill.
 
 > Every command below is shown with `npx @boole/cli`. If you've installed globally
 > (`npm install -g @boole/cli`), drop the `npx @boole/cli` prefix and use `boole` directly —
@@ -48,8 +58,10 @@ per-token bill.
 Run a single prompt through a local model and print the result.
 
 ```bash
-npx @boole/cli run <model> --prompt "<text>" [options]
+npx @boole/cli run [model] --prompt "<text>" [options]
 ```
+
+If you omit `[model]`, Boole uses its default model (Boole 20B, Q4_K_M). The default model downloads automatically on first use and is cached locally.
 
 | Flag | Description |
 |---|---|
@@ -60,7 +72,13 @@ npx @boole/cli run <model> --prompt "<text>" [options]
 | `--top-p <n>` | Nucleus sampling threshold. |
 | `--top-k <n>` | Top-k sampling cutoff. |
 
+**Examples:**
+
 ```bash
+# Use default model
+npx @boole/cli run --prompt "Explain recursion in one sentence" --stream
+
+# Use specific model
 npx @boole/cli run TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M \
   --prompt "Explain recursion in one sentence" \
   --stream \
