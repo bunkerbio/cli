@@ -3,6 +3,8 @@
 **Local-first LLM inference for JavaScript & TypeScript.**
 Run GGUF models on your own hardware via llama.cpp — get cloud-SDK ergonomics without the cloud bill.
 
+Boole ships as both a **library** (import `App`/`Function`/`Sandbox` into your code) and a **CLI** (run inference from your terminal without writing code).
+
 [![npm version](https://img.shields.io/npm/v/@boole/boole.svg)](https://www.npmjs.com/package/@boole/boole)
 [![license](https://img.shields.io/npm/l/@boole/boole.svg)](./LICENSE)
 [![node](https://img.shields.io/node/v/@boole/boole.svg)](package.json)
@@ -49,6 +51,75 @@ console.log(result);
 
 The first call downloads and caches the GGUF weights to `~/.boole/models`; every call
 after that loads from disk and runs entirely on your machine.
+
+## CLI
+
+Boole also ships with a command-line interface for running inference without writing code.
+
+### Installation
+
+The CLI is included when you install `@boole/boole`:
+
+```bash
+npm install -g @boole/boole
+```
+
+### Usage
+
+**One-off generation:**
+
+```bash
+boole run TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M.gguf \
+  --prompt "Write a haiku about GPUs"
+```
+
+Stream tokens as they generate:
+
+```bash
+boole run <model> --prompt "..." --stream
+```
+
+Control sampling parameters:
+
+```bash
+boole run <model> --prompt "..." \
+  --max-tokens 512 \
+  --temperature 0.8 \
+  --top-p 0.95 \
+  --top-k 40
+```
+
+**Pre-download a model:**
+
+```bash
+boole pull TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M.gguf
+```
+
+This downloads the model to `~/.boole/models` without running inference, useful for pre-warming before offline use or CI.
+
+**List cached models:**
+
+```bash
+boole list
+```
+
+Shows all locally cached models with their size on disk.
+
+**Start a local HTTP server:**
+
+```bash
+boole serve --port 8080
+```
+
+Exposes `POST /generate` with JSON body `{ "prompt": "...", "model": "..." }`. Explicitly local-dev-only — no authentication, no production hardening. See `boole serve --help` for details.
+
+**Get help:**
+
+```bash
+boole --help
+boole run --help
+boole serve --help
+```
 
 ## Core concepts
 
