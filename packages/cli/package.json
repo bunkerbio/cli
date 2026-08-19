@@ -1,6 +1,6 @@
 {
   "name": "@boole/cli",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Command-line interface for Boole — run, pull, and serve local LLMs via llama.cpp. Companion CLI to the @boole/boole SDK, bundling the same edge-inference engine independently.",
   "license": "BSD-2-Clause",
   "type": "module",
