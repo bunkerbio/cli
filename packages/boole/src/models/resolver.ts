@@ -10,9 +10,16 @@ export interface ModelResolverConfig {
   huggingFaceToken?: string;
 }
 
+interface RepoFileCache {
+  files: string[];
+  fetchedAt: number;
+}
+
 export class ModelResolver {
   private cacheDir: string;
   private huggingFaceToken?: string;
+  private repoFileCache: Map<string, RepoFileCache> = new Map();
+  private readonly CACHE_TTL_MS = 300000; // 5 minutes
 
   constructor(config: ModelResolverConfig = {}) {
     this.cacheDir = config.cacheDir ?? join(homedir(), ".boole", "models");
@@ -36,7 +43,38 @@ export class ModelResolver {
   }
 
   private async resolveFromHub(modelSpec: string): Promise<string> {
-    const [repoId, filename] = this.parseModelSpec(modelSpec);
+    const [repoId, filenameOrPattern] = this.parseModelSpec(modelSpec);
+
+    // Fetch available files from the repo
+    const availableFiles = await this.fetchRepoFiles(repoId);
+
+    // Try exact match first
+    let filename = availableFiles.find(f => f === filenameOrPattern);
+
+    // If no exact match, try fuzzy matching (case-insensitive pattern search)
+    if (!filename) {
+      const pattern = filenameOrPattern.toLowerCase();
+      const ggufFiles = availableFiles.filter(f => f.toLowerCase().endsWith('.gguf'));
+      const matches = ggufFiles.filter(f => f.toLowerCase().includes(pattern));
+
+      if (matches.length === 0) {
+        throw new ModelNotFoundError(
+          `No file matching "${filenameOrPattern}" found in ${repoId}.\n\n` +
+          `Available GGUF files:\n${ggufFiles.map(f => `  - ${f}`).join('\n')}`
+        );
+      }
+
+      if (matches.length > 1) {
+        throw new ModelNotFoundError(
+          `Multiple files match "${filenameOrPattern}" in ${repoId}:\n` +
+          `${matches.map(f => `  - ${f}`).join('\n')}\n\n` +
+          `Please specify the exact filename after the colon.`
+        );
+      }
+
+      filename = matches[0];
+    }
+
     const localPath = join(this.cacheDir, repoId, filename);
 
     if (await this.isLocalPath(localPath)) {
@@ -57,6 +95,43 @@ export class ModelResolver {
     const repoId = parts[0];
     const filename = parts.slice(1).join(":");
     return [repoId, filename];
+  }
+
+  private async fetchRepoFiles(repoId: string): Promise<string[]> {
+    // Check cache first
+    const cached = this.repoFileCache.get(repoId);
+    if (cached && Date.now() - cached.fetchedAt < this.CACHE_TTL_MS) {
+      return cached.files;
+    }
+
+    // Fetch from HuggingFace API
+    const url = `https://huggingface.co/api/models/${repoId}`;
+    const headers: Record<string, string> = {};
+    if (this.huggingFaceToken) {
+      headers["Authorization"] = `Bearer ${this.huggingFaceToken}`;
+    }
+
+    try {
+      const response = await fetch(url, { headers });
+
+      if (!response.ok) {
+        throw new ModelNotFoundError(
+          `Failed to fetch repo info for ${repoId}: HTTP ${response.status}`
+        );
+      }
+
+      const data = await response.json() as { siblings?: { rfilename: string }[] };
+      const files = (data.siblings || []).map(s => s.rfilename);
+
+      // Cache the result
+      this.repoFileCache.set(repoId, { files, fetchedAt: Date.now() });
+
+      return files;
+    } catch (error) {
+      throw new ModelNotFoundError(
+        `Failed to fetch repo info for ${repoId}: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
   }
 
   private async downloadFromHub(

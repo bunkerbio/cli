@@ -5,17 +5,19 @@ Zero network round-trip. No cold start. No cloud dependency. Powered by llama.cp
 GGUF models directly on your own machine.
 
 [![npm version](https://img.shields.io/npm/v/@boole/cli.svg)](https://www.npmjs.com/package/@boole/cli)
+[![CI](https://github.com/boole-ai/boole-npm/actions/workflows/ci.yml/badge.svg)](https://github.com/boole-ai/boole-npm/actions/workflows/ci.yml)
 [![license](https://img.shields.io/npm/l/@boole/cli.svg)](./LICENSE)
 [![node](https://img.shields.io/node/v/@boole/cli.svg)](package.json)
 
 ```bash
-npm install -g @boole/cli
+npx @boole/cli
 ```
 
-Or try it without installing anything:
+No install needed — this always runs the latest version. If you use Boole often and want
+the shorter `boole` command without the `npx` prefix, install it globally:
 
 ```bash
-npx @boole/cli
+npm install -g @boole/cli
 ```
 
 ---
@@ -23,12 +25,16 @@ npx @boole/cli
 ## Quickstart
 
 ```bash
-boole run mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M --prompt "Write a haiku about GPUs"
+npx @boole/cli run mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M --prompt "Write a haiku about GPUs"
 ```
 
 The first run downloads and caches the GGUF weights to `~/.boole/models`; every run after
 that loads from disk and runs entirely on your machine — no network call, no API key, no
 per-token bill.
+
+> Every command below is shown with `npx @boole/cli`. If you've installed globally
+> (`npm install -g @boole/cli`), drop the `npx @boole/cli` prefix and use `boole` directly —
+> both forms behave identically.
 
 ## Commands
 
@@ -99,9 +105,14 @@ Standard help and version output. Every subcommand also supports `--help`
 
 ## Model specifiers
 
-Models are referenced as `<huggingface-repo>:<gguf-filename>`, e.g.
-`mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M.gguf`, or as a local file path to a `.gguf`
-file already on disk.
+Models are referenced as `<huggingface-repo>:<pattern>`, where `<pattern>` can be either:
+
+- An exact GGUF filename (e.g. `mistral-7b-instruct-v0.2.Q4_K_M.gguf`)
+- A quant pattern like `Q4_K_M` — Boole will find the matching GGUF file automatically
+
+If the pattern matches multiple files, Boole lists them so you can pick the exact one. If no files match, it shows all available GGUF files in the repo.
+
+You can also pass a local file path to a `.gguf` file already on disk.
 
 ## Platform support
 

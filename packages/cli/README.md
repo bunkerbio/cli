@@ -4,31 +4,42 @@
 
 ## Installation
 
+**Use with npx (recommended)** — no installation needed, always up to date:
+
+```bash
+npx @boole/cli run TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M \
+  --prompt "Write a haiku about GPUs"
+```
+
+**Or install globally** if you use Boole often and want the shorter `boole` command:
+
 ```bash
 npm install -g @boole/cli
 ```
 
-This installs the `boole` command globally.
+Once installed globally, you can use `boole` instead of `npx @boole/cli`.
 
 ## Usage
 
 **One-off generation:**
 
 ```bash
-boole run TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M.gguf \
+npx @boole/cli run TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M \
   --prompt "Write a haiku about GPUs"
 ```
+
+The part after the colon can be either an exact filename (like `mistral-7b-instruct-v0.2.Q4_K_M.gguf`) or a quant pattern (like `Q4_K_M`). If the pattern matches multiple files, Boole will list them so you can pick the exact one.
 
 Stream tokens as they generate:
 
 ```bash
-boole run <model> --prompt "..." --stream
+npx @boole/cli run <model> --prompt "..." --stream
 ```
 
 Control sampling parameters:
 
 ```bash
-boole run <model> --prompt "..." \
+npx @boole/cli run <model> --prompt "..." \
   --max-tokens 512 \
   --temperature 0.8 \
   --top-p 0.95 \
@@ -38,7 +49,7 @@ boole run <model> --prompt "..." \
 **Pre-download a model:**
 
 ```bash
-boole pull TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M.gguf
+npx @boole/cli pull TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M
 ```
 
 Downloads the model to `~/.boole/models` without running inference.
@@ -46,13 +57,13 @@ Downloads the model to `~/.boole/models` without running inference.
 **List cached models:**
 
 ```bash
-boole list
+npx @boole/cli list
 ```
 
 **Start a local HTTP server:**
 
 ```bash
-boole serve --port 8080
+npx @boole/cli serve --port 8080
 ```
 
 Exposes `POST /generate` with JSON body `{ "prompt": "...", "model": "..." }`.
@@ -62,9 +73,11 @@ Exposes `POST /generate` with JSON body `{ "prompt": "...", "model": "..." }`.
 **Get help:**
 
 ```bash
-boole --help
-boole run --help
+npx @boole/cli --help
+npx @boole/cli run --help
 ```
+
+If you've installed globally, replace `npx @boole/cli` with `boole` in any of the above commands.
 
 ## Relationship to @boole/boole
 
