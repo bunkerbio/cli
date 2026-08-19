@@ -8,13 +8,14 @@ export interface RunOptions {
   temperature?: number;
   topP?: number;
   topK?: number;
+  hfToken?: string;
 }
 
 export async function runCommand(
   modelSpec: string,
   options: RunOptions
 ): Promise<void> {
-  const resolver = new ModelResolver();
+  const resolver = new ModelResolver({ huggingFaceToken: options.hfToken });
   const engine = new LlamaCppEngine();
 
   try {

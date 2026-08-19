@@ -1,8 +1,8 @@
 import { ModelResolver } from "./models/resolver.js";
 import { stat } from "fs/promises";
 
-export async function pullCommand(modelSpec: string): Promise<void> {
-  const resolver = new ModelResolver();
+export async function pullCommand(modelSpec: string, hfToken?: string): Promise<void> {
+  const resolver = new ModelResolver({ huggingFaceToken: hfToken });
 
   console.log(`Pulling model: ${modelSpec}`);
 

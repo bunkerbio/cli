@@ -17,7 +17,8 @@ const program = new Command();
 program
   .name("boole")
   .description("Local-first LLM inference CLI for JavaScript & TypeScript")
-  .version(packageJson.version);
+  .version(packageJson.version)
+  .option("--hf-token <token>", "Hugging Face API token for gated repositories");
 
 program
   .command("run <model>")
@@ -28,9 +29,10 @@ program
   .option("--temperature <n>", "Sampling temperature", parseFloat)
   .option("--top-p <n>", "Top-p sampling", parseFloat)
   .option("--top-k <n>", "Top-k sampling", parseInt)
-  .action(async (model: string, options) => {
+  .action(async (model: string, options, command) => {
     try {
-      await runCommand(model, options);
+      const hfToken = command.parent.opts().hfToken || process.env.HF_TOKEN;
+      await runCommand(model, { ...options, hfToken });
     } catch (error) {
       console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
       process.exit(1);
@@ -40,9 +42,10 @@ program
 program
   .command("pull <model>")
   .description("Download a GGUF model to local cache")
-  .action(async (model: string) => {
+  .action(async (model: string, options, command) => {
     try {
-      await pullCommand(model);
+      const hfToken = command.parent.opts().hfToken || process.env.HF_TOKEN;
+      await pullCommand(model, hfToken);
     } catch (error) {
       console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
       process.exit(1);
