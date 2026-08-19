@@ -1,6 +1,5 @@
 import { LlamaCppEngine } from "./engine/llama-cpp.js";
 import { ModelResolver } from "./models/resolver.js";
-import type { InferenceEngine } from "./types.js";
 
 export interface RunOptions {
   prompt: string;
@@ -15,36 +14,33 @@ export async function runCommand(
   modelSpec: string,
   options: RunOptions
 ): Promise<void> {
-  const client = new Client();
-  const app = new App({ name: "boole-cli", client });
-
-  const fn = app.function({ model: modelSpec }, async (ctx, _input) => {
-    if (options.stream) {
-      let fullText = "";
-      for await (const chunk of ctx.llm.generateStream(options.prompt, {
-        maxTokens: options.maxTokens,
-        temperature: options.temperature,
-        topP: options.topP,
-      })) {
-        process.stdout.write(chunk);
-        fullText += chunk;
-      }
-      console.log();
-      return fullText;
-    } else {
-      const result = await ctx.llm.generate(options.prompt, {
-        maxTokens: options.maxTokens,
-        temperature: options.temperature,
-        topP: options.topP,
-      });
-      console.log(result);
-      return result;
-    }
-  });
+  const resolver = new ModelResolver();
+  const engine = new LlamaCppEngine();
 
   try {
-    await fn.call(null);
+    const modelPath = await resolver.resolve(modelSpec);
+    await engine.loadModel(modelPath);
+
+    if (options.stream) {
+      for await (const chunk of engine.generateStream(options.prompt, {
+        maxTokens: options.maxTokens,
+        temperature: options.temperature,
+        topP: options.topP,
+        topK: options.topK,
+      })) {
+        process.stdout.write(chunk.text);
+      }
+      console.log();
+    } else {
+      const result = await engine.generate(options.prompt, {
+        maxTokens: options.maxTokens,
+        temperature: options.temperature,
+        topP: options.topP,
+        topK: options.topK,
+      });
+      console.log(result.text);
+    }
   } finally {
-    await app.cleanup();
+    await engine.unloadModel();
   }
 }

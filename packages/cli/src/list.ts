@@ -1,4 +1,4 @@
-import { ModelResolver } from "../models/resolver.js";
+import { ModelResolver } from "./models/resolver.js";
 import { readdir, stat } from "fs/promises";
 import { join } from "path";
 
