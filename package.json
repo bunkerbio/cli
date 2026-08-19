@@ -1,7 +1,7 @@
 {
-  "name": "@boole/boole-cli",
+  "name": "@boole/boole",
   "version": "0.3.0",
-  "description": "Local-first LLM inference SDK for JavaScript & TypeScript. Run GGUF models on your own hardware via llama.cpp, with an App/Function/Sandbox API and a 10x cost cut over always-remote inference.",
+  "description": "Run AI models at the edge — SDK and CLI for local-first LLM inference. Zero network latency, no cold starts, no cloud dependency. Powered by llama.cpp and GGUF.",
   "license": "BSD-2-Clause",
   "type": "module",
   "engines": {
