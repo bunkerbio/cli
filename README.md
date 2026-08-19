@@ -15,7 +15,46 @@ npm install -g @boole/cli
 
 ---
 
-## Quickstart
+## Usage Modes
+
+Boole CLI works in two ways:
+
+1. **Interactive Mode** — Launch a rich terminal interface for chat and agentic workflows
+2. **Command Mode** — Run one-off commands for specific tasks
+
+### Interactive Mode
+
+Launch the TUI (Terminal User Interface) by running `boole` with no arguments:
+
+```bash
+boole
+```
+
+This starts an interactive session with two modes:
+
+**Chat Mode (default)** — Ask questions and get streaming responses from the local model:
+- Type your prompt and press Enter
+- Responses stream in real-time with syntax-highlighted code blocks
+- Full conversation history maintained
+
+**Agent Mode** — Enable tool use for reading/writing files and running shell commands:
+- Type `/agent` to switch to agentic mode
+- The model can propose file reads, file writes, and shell commands
+- **Every write or shell command requires your explicit approval (y/n)**
+- File reads are executed without confirmation but logged visibly
+- Type `/chat` to return to chat-only mode
+
+**Slash Commands:**
+- `/agent` — Switch to agentic mode (model can use tools)
+- `/chat` — Switch to chat-only mode
+- `/model <name>` — Switch to a different model mid-session
+- `/clear` — Clear conversation history
+- `/help` — Show available commands
+- `/exit` — Exit the TUI (or press Ctrl+C)
+
+### Command Mode (Quickstart)
+
+Run one-off generations without entering interactive mode:
 
 ```bash
 boole run mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M --prompt "Write a haiku about GPUs"
