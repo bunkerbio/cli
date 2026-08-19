@@ -1,93 +1,133 @@
 # @boole/cli
 
-**CLI for local-first LLM inference.** Run GGUF models from your terminal with zero network latency, no cold starts, no cloud dependency.
+**Run AI models at the edge, from your terminal.**
+Zero network round-trip. No cold start. No cloud dependency. Powered by llama.cpp — run
+GGUF models directly on your own machine.
 
-## Installation
-
-**Use with npx (recommended)** — no installation needed, always up to date:
+[![npm version](https://img.shields.io/npm/v/@boole/cli.svg)](https://www.npmjs.com/package/@boole/cli)
+[![CI](https://github.com/boole-ai/boole-npm/actions/workflows/ci.yml/badge.svg)](https://github.com/boole-ai/boole-npm/actions/workflows/ci.yml)
+[![license](https://img.shields.io/npm/l/@boole/cli.svg)](./LICENSE)
+[![node](https://img.shields.io/node/v/@boole/cli.svg)](package.json)
 
 ```bash
-npx @boole/cli run TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M \
-  --prompt "Write a haiku about GPUs"
+npx @boole/cli
 ```
 
-**Or install globally** if you use Boole often and want the shorter `boole` command:
+No install needed — this always runs the latest version. If you use Boole often and want
+the shorter `boole` command without the `npx` prefix, install it globally:
 
 ```bash
 npm install -g @boole/cli
 ```
 
-Once installed globally, you can use `boole` instead of `npx @boole/cli`.
+---
 
-## Usage
-
-**One-off generation:**
+## Quickstart
 
 ```bash
-npx @boole/cli run TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M \
-  --prompt "Write a haiku about GPUs"
+npx @boole/cli run mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M --prompt "Write a haiku about GPUs"
 ```
 
-The part after the colon can be either an exact filename (like `mistral-7b-instruct-v0.2.Q4_K_M.gguf`) or a quant pattern (like `Q4_K_M`). If the pattern matches multiple files, Boole will list them so you can pick the exact one.
+The first run downloads and caches the GGUF weights to `~/.boole/models`; every run after
+that loads from disk and runs entirely on your machine — no network call, no API key, no
+per-token bill.
 
-Stream tokens as they generate:
+> Every command below is shown with `npx @boole/cli`. If you've installed globally
+> (`npm install -g @boole/cli`), drop the `npx @boole/cli` prefix and use `boole` directly —
+> both forms behave identically.
+
+## Commands
+
+### `boole run`
+
+Run a single prompt through a local model and print the result.
 
 ```bash
-npx @boole/cli run <model> --prompt "..." --stream
+npx @boole/cli run <model> --prompt "<text>" [options]
 ```
 
-Control sampling parameters:
+| Flag | Description |
+|---|---|
+| `--prompt <text>` | The prompt to generate from. Required. |
+| `--stream` | Stream tokens to stdout as they generate, instead of waiting for the full response. |
+| `--max-tokens <n>` | Maximum tokens to generate. |
+| `--temperature <n>` | Sampling temperature. |
+| `--top-p <n>` | Nucleus sampling threshold. |
+| `--top-k <n>` | Top-k sampling cutoff. |
 
 ```bash
-npx @boole/cli run <model> --prompt "..." \
-  --max-tokens 512 \
-  --temperature 0.8 \
-  --top-p 0.95 \
-  --top-k 40
+npx @boole/cli run mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M \
+  --prompt "Explain recursion in one sentence" \
+  --stream \
+  --max-tokens 200
 ```
 
-**Pre-download a model:**
+### `boole pull`
+
+Pre-download a model into the local cache without running inference — useful for warming
+the cache ahead of offline use, or in CI.
 
 ```bash
-npx @boole/cli pull TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M
+npx @boole/cli pull mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M
 ```
 
-Downloads the model to `~/.boole/models` without running inference.
+### `boole serve`
 
-**List cached models:**
-
-```bash
-npx @boole/cli list
-```
-
-**Start a local HTTP server:**
+Start a local HTTP server exposing a loaded model over a simple REST endpoint, so other
+tools or languages can hit it without needing a JS runtime.
 
 ```bash
 npx @boole/cli serve --port 8080
 ```
 
-Exposes `POST /generate` with JSON body `{ "prompt": "...", "model": "..." }`.
-
-**⚠️ Local development only** - no authentication, no production hardening.
-
-**Get help:**
-
 ```bash
-npx @boole/cli --help
-npx @boole/cli run --help
+curl -X POST http://localhost:8080/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Say hello"}'
 ```
 
-If you've installed globally, replace `npx @boole/cli` with `boole` in any of the above commands.
+> **Local use only.** `boole serve` has no authentication and no production hardening — it's
+> a convenience for local development and scripting, not a deployable server. Don't expose
+> it to an untrusted network.
 
-## Relationship to @boole/boole
+### `boole list`
 
-`@boole/cli` and [`@boole/boole`](https://npmjs.com/package/@boole/boole) (the library) are separate packages. The CLI bundles its own inference logic and does not depend on the library package.
+List locally cached models and their size on disk.
 
-- Use `@boole/cli` for running inference from the terminal
-- Use `@boole/boole` for embedding inference into your JavaScript/TypeScript applications
+```bash
+npx @boole/cli list
+```
 
-Both use the same underlying llama.cpp engine and cache models in `~/.boole/models`.
+### `--help` / `--version`
+
+Standard help and version output. Every subcommand also supports `--help`
+(e.g. `npx @boole/cli run --help`).
+
+## Model specifiers
+
+Models are referenced as `<huggingface-repo>:<gguf-filename>`, e.g.
+`mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M.gguf`, or as a local file path to a `.gguf`
+file already on disk.
+
+## Platform support
+
+`@boole/cli` uses native bindings (via `node-llama-cpp`) to talk to llama.cpp directly, with
+GPU offload where available.
+
+| Platform | CPU | GPU acceleration |
+|---|---|---|
+| macOS (Apple Silicon) | ✅ | ✅ Metal |
+| macOS (Intel) | ✅ | — |
+| Linux (x64/arm64) | ✅ | ✅ CUDA / Vulkan |
+| Windows (x64) | ✅ | ✅ CUDA / Vulkan |
+
+Prebuilt binaries are used where available; unsupported platform/architecture combinations
+fall back to compiling from source on install.
+
+## Contributing
+
+Issues and PRs welcome. See [CONTRIBUTING.md](../../CONTRIBUTING.md) for local dev setup.
 
 ## License
 
-BSD-2-Clause
+MIT © Boole
