@@ -76,15 +76,19 @@ program
     }
   });
 
-// Parse args but don't exit if no subcommand
-program.parse();
+// Check if any command or option was provided
+const args = process.argv.slice(2);
+const hasArgs = args.length > 0;
 
-// If no subcommand was provided (just "boole"), launch the TUI
-if (program.args.length === 0) {
+// If no args at all, launch TUI
+if (!hasArgs) {
   try {
     await launchTUI();
   } catch (error) {
     console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
     process.exit(1);
   }
+} else {
+  // Parse commands normally (including --version, --help, etc.)
+  program.parse();
 }

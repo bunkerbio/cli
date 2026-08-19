@@ -7,3 +7,4 @@ package/
 coverage/
 .env
 .env.local
+.claude/
