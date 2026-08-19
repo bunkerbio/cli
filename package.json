@@ -2,7 +2,7 @@
   "name": "@boole/boole",
   "version": "0.2.0",
   "description": "Local-first LLM inference SDK for JavaScript & TypeScript. Run GGUF models on your own hardware via llama.cpp, with an App/Function/Sandbox API and a 10x cost cut over always-remote inference.",
-  "license": "Apache-2.0",
+  "license": "BSD-2-Clause",
   "type": "module",
   "engines": {
     "node": ">=20"
@@ -22,6 +22,9 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "boole": "./dist/cli/index.js"
+  },
   "files": [
     "dist",
     "README.md",
@@ -43,6 +46,7 @@
     "release": "pnpm build && changeset publish"
   },
   "dependencies": {
+    "commander": "^14.0.3",
     "node-llama-cpp": "^3.1.1"
   },
   "devDependencies": {
