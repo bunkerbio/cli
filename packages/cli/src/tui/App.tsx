@@ -140,7 +140,12 @@ export function App({ initialModel }: AppProps) {
         marginBottom={1}
       >
         <Text bold color={theme.accent}>
-          Boole Interactive Mode
+          {`██████╗  ██████╗  ██████╗ ██╗     ███████╗
+██╔══██╗██╔═══██╗██╔═══██╗██║     ██╔════╝
+██████╔╝██║   ██║██║   ██║██║     █████╗
+██╔══██╗██║   ██║██║   ██║██║     ██╔══╝
+██████╔╝╚██████╔╝╚██████╔╝███████╗███████╗
+╚═════╝  ╚═════╝  ╚═════╝ ╚══════╝╚══════╝`}
         </Text>
         <Text dimColor>
           Type your prompt or use /help for commands. Ctrl+C to exit.
