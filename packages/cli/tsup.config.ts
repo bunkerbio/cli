@@ -12,4 +12,9 @@ export default defineConfig({
   banner: {
     js: "#!/usr/bin/env node",
   },
+  esbuildOptions(options) {
+    options.jsx = "transform";
+    options.jsxFactory = "React.createElement";
+    options.jsxFragment = "React.Fragment";
+  },
 });
