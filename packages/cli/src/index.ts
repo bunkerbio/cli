@@ -3,6 +3,7 @@ import { runCommand } from "./run.js";
 import { pullCommand } from "./pull.js";
 import { serveCommand } from "./serve.js";
 import { listCommand } from "./list.js";
+import { launchTUI } from "./tui/index.js";
 import { readFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -75,4 +76,15 @@ program
     }
   });
 
+// Parse args but don't exit if no subcommand
 program.parse();
+
+// If no subcommand was provided (just "boole"), launch the TUI
+if (program.args.length === 0) {
+  try {
+    await launchTUI();
+  } catch (error) {
+    console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
+    process.exit(1);
+  }
+}
