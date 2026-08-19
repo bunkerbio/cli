@@ -1,12 +1,12 @@
 {
-  "name": "boole-monorepo",
-  "version": "0.0.0",
+  "name": "@boole/cli",
+  "version": "0.4.1",
   "private": true,
-  "description": "Boole monorepo: @boole/boole (library) and @boole/cli (CLI tool) for local-first LLM inference",
+  "description": "Command-line interface for Boole — run, pull, and serve local LLMs via llama.cpp. Companion CLI to the @boole/boole SDK, bundling the same edge-inference engine independently.",
   "license": "BSD-2-Clause",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/boole-ai/boole-npm.git"
+    "url": "git+https://github.com/boole-ai/cli.git"
   },
   "scripts": {
     "build": "pnpm -r --filter './packages/*' run build",

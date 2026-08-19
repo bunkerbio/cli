@@ -1,84 +1,122 @@
-# Boole
+# @boole/cli
 
-**Local-first LLM inference for JavaScript & TypeScript.**
+**Run AI models at the edge, from your terminal.**
+Zero network round-trip. No cold start. No cloud dependency. Powered by llama.cpp — run
+GGUF models directly on your own machine.
 
-Boole ships as two separate npm packages:
-
-## [@boole/boole](./packages/boole) - Library
-
-The SDK for embedding LLM inference into your JavaScript/TypeScript applications.
-
-```bash
-npm install @boole/boole
-```
-
-```ts
-import { App } from "@boole/boole";
-
-const app = new App({ name: "my-app" });
-
-const generate = app.function(
-  { model: "TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M.gguf" },
-  async (ctx, prompt: string) => ctx.llm.generate(prompt),
-);
-
-const result = await generate.call("Write a haiku about GPUs");
-console.log(result);
-```
-
-[Full library documentation →](./packages/boole/README.md)
-
-## [@boole/cli](./packages/cli) - Command-line tool
-
-Run LLM inference from your terminal without writing code.
+[![npm version](https://img.shields.io/npm/v/@boole/cli.svg)](https://www.npmjs.com/package/@boole/cli)
+[![CI](https://github.com/boole-ai/boole-npm/actions/workflows/ci.yml/badge.svg)](https://github.com/boole-ai/boole-npm/actions/workflows/ci.yml)
+[![license](https://img.shields.io/npm/l/@boole/cli.svg)](./LICENSE)
+[![node](https://img.shields.io/node/v/@boole/cli.svg)](package.json)
 
 ```bash
 npm install -g @boole/cli
 ```
 
-```bash
-boole run TheBloke/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M.gguf \
-  --prompt "Write a haiku about GPUs"
-```
+---
 
-[Full CLI documentation →](./packages/cli/README.md)
-
-## Key Features
-
-- **~10x cheaper by default** — no metered API calls for work your hardware can already do
-- **No cold starts** — models load once into a long-lived local process
-- **No data leaves your machine** — prompts, context, and outputs stay local
-- **Zero network latency** — inference runs on your own hardware
-
-## Relationship Between Packages
-
-`@boole/boole` and `@boole/cli` are independent packages:
-
-- They **do not depend on each other** - you can install one without the other
-- They **share the model cache** (`~/.boole/models`) - models downloaded by one are available to the other
-- They **use the same inference engine** (llama.cpp) under the hood
-- The CLI bundles its own copy of the inference logic, so there is some intentional code duplication
-
-## Development
-
-This is a pnpm monorepo:
+## Quickstart
 
 ```bash
-# Install dependencies for all packages
-pnpm install
-
-# Build all packages
-pnpm build
-
-# Test all packages
-pnpm test
-
-# Work on a specific package
-cd packages/boole
-pnpm build
-pnpm test
+boole run mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M --prompt "Write a haiku about GPUs"
 ```
+
+The first run downloads and caches the GGUF weights to `~/.boole/models`; every run after
+that loads from disk and runs entirely on your machine — no network call, no API key, no
+per-token bill.
+
+## Commands
+
+### `boole run`
+
+Run a single prompt through a local model and print the result.
+
+```bash
+boole run <model> --prompt "<text>" [options]
+```
+
+| Flag | Description |
+|---|---|
+| `--prompt <text>` | The prompt to generate from. Required. |
+| `--stream` | Stream tokens to stdout as they generate, instead of waiting for the full response. |
+| `--max-tokens <n>` | Maximum tokens to generate. |
+| `--temperature <n>` | Sampling temperature. |
+| `--top-p <n>` | Nucleus sampling threshold. |
+| `--top-k <n>` | Top-k sampling cutoff. |
+
+```bash
+boole run mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M \
+  --prompt "Explain recursion in one sentence" \
+  --stream \
+  --max-tokens 200
+```
+
+### `boole pull`
+
+Pre-download a model into the local cache without running inference — useful for warming
+the cache ahead of offline use, or in CI.
+
+```bash
+boole pull mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M
+```
+
+### `boole serve`
+
+Start a local HTTP server exposing a loaded model over a simple REST endpoint, so other
+tools or languages can hit it without needing a JS runtime.
+
+```bash
+boole serve --port 8080
+```
+
+```bash
+curl -X POST http://localhost:8080/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Say hello"}'
+```
+
+> **Local use only.** `boole serve` has no authentication and no production hardening — it's
+> a convenience for local development and scripting, not a deployable server. Don't expose
+> it to an untrusted network.
+
+### `boole list`
+
+List locally cached models and their size on disk.
+
+```bash
+boole list
+```
+
+### `boole --help` / `boole --version`
+
+Standard help and version output. Every subcommand also supports `--help`
+(e.g. `boole run --help`).
+
+## Model specifiers
+
+Models are referenced as `<huggingface-repo>:<gguf-filename>`, e.g.
+`mistralai/Mistral-7B-Instruct-v0.2-GGUF:Q4_K_M.gguf`, or as a local file path to a `.gguf`
+file already on disk.
+
+## Platform support
+
+`@boole/cli` uses native bindings (via `node-llama-cpp`) to talk to llama.cpp directly, with
+GPU offload where available.
+
+| Platform | CPU | GPU acceleration |
+|---|---|---|
+| macOS (Apple Silicon) | ✅ | ✅ Metal |
+| macOS (Intel) | ✅ | — |
+| Linux (x64/arm64) | ✅ | ✅ CUDA / Vulkan |
+| Windows (x64) | ✅ | ✅ CUDA / Vulkan |
+
+Prebuilt binaries are used where available; unsupported platform/architecture combinations
+fall back to compiling from source on install.
+
+## Contributing
+
+Issues and PRs welcome. See [CONTRIBUTING.md](../../CONTRIBUTING.md) for local dev setup.
 
 ## License
 
-BSD-2-Clause
+MIT © Boole
